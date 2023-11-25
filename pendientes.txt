@@ -1,0 +1,9 @@
+
+Rentas ver el tema de las plantillas de mensajes de wsp:
+	el link va andar como link con una ip amigable sino no lo toma como link
+
+
+Catastro 
+	mandaron mail de modificaciones, de eso faltaria solo:
+	- probar lo echo
+	- del mail ver seccion CONVERSACIONES

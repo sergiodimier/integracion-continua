@@ -3,7 +3,7 @@ pipeline {
     stages{
         stage('Test'){
             steps {
-                sh 'cd /mnt && git pull'
+                sh 'cd /mnt/integracion-continua && git pull'
             }
         }
     }

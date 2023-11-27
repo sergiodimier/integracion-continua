@@ -3,7 +3,7 @@ pipeline {
     stages{
         stage('Test'){
             steps {
-                sh 'cd /mnt && git clone https://github.com/sergiodimier/integracion-continua.git'
+                sh 'cd /mnt && sudo git clone https://github.com/sergiodimier/integracion-continua.git'
             }
         }
     }

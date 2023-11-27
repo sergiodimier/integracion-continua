@@ -1,10 +1,28 @@
 pipeline {
     agent any
-    stages{
-        stage('Test'){
+
+    stages {
+        stage('Update Repositories and Restart Docker') {
             steps {
-                sh 'cd /mnt/integracion-continua && git pull'
+                script {
+                    // Navegar a la carpeta del repositorio
+                    dir("/mnt/integracion-continua") {
+                        // Realizar un git pull
+                        sh 'git pull origin main'
+                    }
+
+                    // Reiniciar el contenedor Docker (ajusta el comando según tus necesidades)
+                    sh 'docker restart portainer'
+                }
             }
         }
+    }
+
+    options {
+        buildDiscarder(logRotator(artifactDaysToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10', artifactNumToKeepStr: '10'))
+    }
+
+    triggers {
+        githubPush()
     }
 }

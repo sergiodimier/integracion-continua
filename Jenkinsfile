@@ -6,7 +6,7 @@ pipeline {
                 script {
                     withCredentials(
                         [usernamePassword(
-                            credentialsId: 'Portainer',
+                            credentialsId: 'e3d747ef-1364-469d-aaa9-c83db13d51f6',
                             usernameVariable: 'PORTAINER_USERNAME',
                             passwordVariable: 'PORTAINER_PASSWORD',
                         )]    

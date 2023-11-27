@@ -1,0 +1,23 @@
+version: '3'
+services:
+  odoo:
+    image: ing:ingenio
+    depends_on:
+      - db
+    ports:
+      - "8033:8069"
+    volumes:
+      - odoo-data:/var/lib/odoo
+    entrypoint: /entrypoint.sh -- --database=TEST
+  db:
+    image: postgres:10
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=odoo
+      - POSTGRES_USER=odoo
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data/pgdata
+volumes:
+  odoo-data:
+  odoo-db-data:

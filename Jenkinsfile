@@ -16,11 +16,17 @@ pipeline {
                             {"Username": "$PORTAINER_USERNAME", "Password": "$PORTAINER_PASSWORD"}
                         """
                         echo "Antes de la solicitud HTTP"
-                        echo "$PORTAINER_USERNAME ---- $PORTAINER_PASSWORD"
-                        def jwtResponse = httpRequest acceptType: 'APPLICATION_JSON', 
-                        contentType: 'APPLICATION_JSON', validResponseCodes: '200', httpMode: 'POST', 
-                        ignoreSslErrors: true, consoleLogResponseBody: true, requestBody: json, url: "https://192.168.0.245:9443/api/auth"
-                        echo "en medio de la solicitud HTTP"
+
+                        def jwtResponse = httpRequest(
+                            acceptType: 'APPLICATION_JSON',
+                            contentType: 'APPLICATION_JSON',
+                            httpMode: 'POST',
+                            requestBody: json,
+                            ignoreSslErrors: true,  // Habilita la omisión de errores SSL
+                            url: 'https://192.168.0.245:9443/api/auth'
+                        )
+
+                        echo "En medio de la solicitud HTTP"
                         def jwtObject = new groovy.json.JsonSlurper().parseText(jwtResponse.getContent())
                         env.JWTTOKEN = "Bearer ${jwtObject.jwt}"
                         echo "Despues de la solicitud HTTP"

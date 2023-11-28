@@ -4,39 +4,17 @@ pipeline {
         stage('Get Credential Tokens'){
             steps {
                 script {
-                    git branch: 'main', credentialsId: 'e3d747ef-1364-469d-aaa9-c83db13d51f6', url: 'https://github.com/sergiodimier/integracion-continua.git'
-                    // withCredentials(
-                    //     [usernamePassword(
-                    //         credentialsId: 'Portainer',
-                    //         usernameVariable: 'PORTAINER_USERNAME',
-                    //         passwordVariable: 'PORTAINER_PASSWORD',
-                    //     )]    
-                    // )
-                    // {
-                    //     def json="""
-                    //         {"Username": "$PORTAINER_USERNAME", "Password": "$PORTAINER_PASSWORD"}
-                    //     """
-                    //     echo "Antes de la solicitud HTTP"
-                    //     def jwtResponse = httpRequest acceptType: 'APPLICATION_JSON', 
-                    //     contentType: 'APPLICATION_JSON', validResponseCodes: '200', httpMode: 'POST', 
-                    //     ignoreSslErrors: true, consoleLogResponseBody: true, requestBody: json, url: "https://192.168.0.245:9443/api/auth"
-                    //     echo "En medio de la solicitud HTTP"
-                    //     def jwtObject = new groovy.json.JsonSlurper().parseText(jwtResponse.getContent())
-                    //     env.JWTTOKEN = "Bearer ${jwtObject.jwt}"
-                    //     echo "Despues de la solicitud HTTP"
-                    // }
+                    // git branch: 'main', credentialsId: 'e3d747ef-1364-469d-aaa9-c83db13d51f6', url: 'https://github.com/sergiodimier/integracion-continua.git'
+                    dir("/mnt") {
+                        checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'e3d747ef-1364-469d-aaa9-c83db13d51f6', url: 'https://github.com/sergiodimier/integracion-continua.git']])
+                    }
                 }
             }
         }
         stage('Build Docker Image on Portainer') {
             steps {
                 script {
-                  withCredentials([usernamePassword(credentialsId: 'e3d747ef-1364-469d-aaa9-c83db13d51f6', usernameVariable: 'BB_USERNAME', passwordVariable: 'BB_PASSWORD')]) {
-                      def repoURL = """
-                        https://192.168.0.245:9443/api/endpoints/1/docker/build?t=ing:ingenio&remote=https://github.com/$BB_USERNAME:$BB_PASSWORD/integracion-continua.git&dockerfile=Dockerfile
-                      """
-                      def imageResponse = httpRequest httpMode: 'POST', ignoreSslErrors: true, url: repoURL, validResponseCodes: '200', customHeaders:[[name:"Authorization", value: env.JWTTOKEN ]]
-                  }
+                  httpRequest acceptType: 'APPLICATION_JSON', authentication: 'Portainer', consoleLogResponseBody: true, contentType: 'APPLICATION_JSON', httpMode: 'POST', ignoreSslErrors: true, proxyAuthentication: 'Portainer', responseHandle: 'NONE', url: 'https://192.168.0.245:9443/api/auth', useSystemProperties: true, wrapAsMultipart: false
                 }
             }
         }

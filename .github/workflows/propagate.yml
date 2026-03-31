@@ -23,10 +23,9 @@ jobs:
 
       - name: Actualizar Submódulo
         run: |
-          git submodule update --init --remote submodules/integracion-continua
+          git submodule update --init --recursive --remote submodules/integracion-continua
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
-          # Solo hace commit si realmente hubo cambios
           git add .
           git diff-index --quiet HEAD || git commit -m "Auto-update integracion-continua to latest"
-          git push origin github
+          git push origin main

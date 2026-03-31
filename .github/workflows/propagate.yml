@@ -1,0 +1,32 @@
+name: Propagate Updates to Clients
+
+on:
+  push:
+    branches:
+      # Cambiar por main o las versiones especificas TAMBIEN cambiar en el run de steps
+      - github
+
+jobs:
+  update-clients:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Aquí listas todos los repositorios que usan este submódulo
+        repo: ['sergiodimier/principal-intcontinua']
+    steps:
+      - name: Checkout Cliente
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ matrix.repo }}
+          token: ${{ secrets.GLOBAL_DISPATCH_TOKEN }}
+          submodules: true
+
+      - name: Actualizar Submódulo
+        run: |
+          git submodule update --init --remote integracion-continua
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          # Solo hace commit si realmente hubo cambios
+          git add .
+          git diff-index --quiet HEAD || git commit -m "Auto-update integracion-continua to latest"
+          git push origin github

@@ -20,12 +20,22 @@ jobs:
           repository: ${{ matrix.repo }}
           token: ${{ secrets.GLOBAL_DISPATCH_TOKEN }}
           submodules: true
+          fetch-depth: 0
 
       - name: Actualizar Submódulo
         run: |
-          git submodule update --init --recursive --remote submodules/integracion-continua
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git submodule update --init --recursive --remote
+          
           git add .
-          git diff-index --quiet HEAD || git commit -m "Auto-update integracion-continua to latest"
-          git push origin main
+          if ! git diff-index --quiet HEAD; then
+            git commit -m "Auto-update submodules"
+            # Al haber hecho el checkout con el PAT arriba, 
+            # este push será reconocido como "manual" por GitHub
+            # y disparará la Action en el repo COTA.
+            git push origin main
+          else
+            echo "Sin cambios"
+          fi

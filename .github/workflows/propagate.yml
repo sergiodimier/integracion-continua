@@ -23,7 +23,7 @@ jobs:
 
       - name: Actualizar Submódulo
         run: |
-          git submodule update --init --recursive --remote submodules/integracion-continua
+          git submodule update --init --recursive --remote submodules/submodules/integracion-continua
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           git add .

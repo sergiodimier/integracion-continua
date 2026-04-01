@@ -23,9 +23,29 @@ jobs:
 
       - name: Actualizar Submódulo
         run: |
-          git submodule update --init --recursive --remote submodules/submodules/integracion-continua
+          # 1. Configurar Usuario
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
+
+          # 2. Inyectar Token (Crucial para que el submódulo se deje leer)
+          git config --global url."https://x-token-auth:${{ secrets.GLOBAL_DISPATCH_TOKEN }}@github.com/".insteadOf "https://github.com/"
+          git config --global url."https://x-token-auth:${{ secrets.GLOBAL_DISPATCH_TOKEN }}@github.com/".insteadOf "git@github.com:"
+
+          # 3. Sincronizar URLs (Por si cambió de SSH a HTTPS)
+          git submodule sync --recursive
+
+          # 4. Forzar el descubrimiento de ramas en el submódulo
+          # Entramos a la ruta, traemos todo y volvemos a salir
+          git submodule update --init --recursive
+          cd submodules/submodules/integracion-continua
+          git fetch origin github
+          git checkout github
+          cd ../../../
+
+          # 5. Ahora sí, update remoto
+          git submodule update --remote --recursive submodules/submodules/integracion-continua
+
+          # 6. Push de los cambios
           git add .
-          git diff-index --quiet HEAD || git commit -m "Auto-update integracion-continua to latest"
+          git diff-index --quiet HEAD || git commit -m "Auto-update integracion-continua to latest on branch github"
           git push origin main

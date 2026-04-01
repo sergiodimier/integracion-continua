@@ -23,32 +23,33 @@ jobs:
 
       - name: Actualizar Submódulo
         run: |
-          # 1. Configurar Usuario
+          # 1. Configuración de identidad
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
 
-          # 2. Inyectar Token para los submódulos
+          # 2. Inyectar Token (Asegúrate de que GLOBAL_DISPATCH_TOKEN sea válido)
           git config --global url."https://x-token-auth:${{ secrets.GLOBAL_DISPATCH_TOKEN }}@github.com/".insteadOf "https://github.com/"
           git config --global url."https://x-token-auth:${{ secrets.GLOBAL_DISPATCH_TOKEN }}@github.com/".insteadOf "git@github.com:"
 
-          # 3. Sincronizar e inicializar
+          # 3. Sincronizar e inicializar submódulos
           git submodule sync --recursive
           git submodule update --init --recursive
 
-          # 4. Entrar al submódulo y forzar la rama
+          # 4. Forzar la actualización de la rama 'github' en el submódulo
+          # Entramos a la carpeta y forzamos el FETCH de esa rama específica
           cd submodules/submodules/integracion-continua
-          git fetch origin github
-          # Usamos -B para crear/resetear la rama local basada en la remota
-          git checkout -B github origin/github
+          git fetch origin github:github
+          git checkout github
+          git pull origin github
           cd ../../../
 
-          # 5. Actualizar el puntero del repo padre
+          # 5. Registrar el cambio en el repo padre
           git add submodules/submodules/integracion-continua
           
-          # 6. Push si hay cambios
+          # 6. Commit y Push si hay cambios
           if ! git diff-index --quiet HEAD; then
             git commit -m "Auto-update integracion-continua to latest on branch github"
             git push origin main
           else
-            echo "Sin cambios para commitear"
+            echo "No hay cambios nuevos en el submódulo"
           fi

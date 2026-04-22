@@ -12,12 +12,14 @@ jobs:
     strategy:
       matrix:
         # Aquí listas todos los repositorios que usan este submódulo
-        repo: ['sergiodimier/principal-intcontinua']
+        repo:
+          - { name: 'sergiodimier/principal-intcontinua', path: 'submodules/submodules/integracion-continua' }
+
     steps:
       - name: Checkout Cliente
         uses: actions/checkout@v4
         with:
-          repository: ${{ matrix.repo }}
+          repository: ${{ matrix.repo.name }}
           token: ${{ secrets.GLOBAL_DISPATCH_TOKEN }}
           submodules: true
 
@@ -37,14 +39,14 @@ jobs:
 
           # 4. Forzar la actualización de la rama 'github' en el submódulo
           # Entramos a la carpeta y forzamos el FETCH de esa rama específica
-          cd submodules/submodules/integracion-continua
+          cd "${{ matrix.repo.path }}"
           git fetch origin github:github
           git checkout github
           git pull origin github
-          cd ../../../
+          cd "$GITHUB_WORKSPACE"
 
           # 5. Registrar el cambio en el repo padre
-          git add submodules/submodules/integracion-continua
+          git add "${{ matrix.repo.path }}"
           
           # 6. Commit y Push si hay cambios
           if ! git diff-index --quiet HEAD; then
